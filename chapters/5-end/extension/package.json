@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --watch"
+    "start": "webpack --watch",
+    "generate-zip": "node generate-zip.js"
   },
   "keywords": [],
   "author": "",
