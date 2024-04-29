@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>AI-cruiter by WorkInBiotech.com</title>
+  <style>
+    body {
+      width: 400px !important;
+      height: 400px !important;
+      margin: 0px;
+      font-size: 13px;
+      overflow-x: hidden !important;
+    }
+
+    #evaluation-log {
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    .button {
+      /* Green */
+      border: none;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background-color: #4CAF50;
+    }
+
+    .btn-secondary {
+      background-color: #151516;
+    }
+
+    .btn-secondary {
+      background-color: #151516;
+    }
+
+    .btn-small {
+      padding: 4px 8px;
+      font-size: inherit;
+    }
+
+    .button[disabled] {
+      border: 1px solid #999999;
+      background-color: #cccccc;
+      color: #666666;
+    }
+
+    #user-info {
+      font-weight: 600;
+      margin-top: 10px;
+      margin-left: 10px;
+    }
+
+    .clear {
+      clear: both;
+    }
+
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #FFF;
+      border-bottom-color: #FF3D00;
+      border-radius: 50%;
+      display: inline-block;
+      box-sizing: border-box;
+      animation: rotation 1s linear infinite;
+      position: absolute;
+      left: 40%;
+      top: 50%;
+    }
+
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .evaluation-spinner {
+      display: inline-flex;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: radial-gradient(farthest-side, #09090d 94%, #0000) top/9px 9px no-repeat,
+        conic-gradient(#0000 30%, #09090d);
+      -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 9px), #000 0);
+      animation: spinner-c7wet2 1s infinite linear;
+    }
+
+    @keyframes spinner-c7wet2 {
+      100% {
+        transform: rotate(1turn);
+      }
+    }
+
+    .header {
+      background-color: #dce7f1;
+      margin-top: 20px;
+      display: table-cell;
+      width: 800px;
+      vertical-align: middle;
+      padding: 5px 20px;
+    }
+
+    .main-container {
+      background-color: #dce7f1;
+      padding: 0px 15px 15px 15px;
+      overflow-x: hidden;
+    }
+
+    .applicants-container {
+      padding: 10px 15px;
+      overflow-x: hidden;
+    }
+
+    .account {
+      display: inline-flex;
+    }
+
+    .account-column {
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .main {
+      padding: 10px;
+    }
+
+    #job-detail {
+      margin-left: 10px;
+    }
+
+    #job-detail h4 {
+      display: inline-block;
+      margin: 0px;
+    }
+
+    #summaries {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      display: inline-flex;
+      margin-left: 5px;
+    }
+
+    #logout {
+      cursor: pointer;
+    }
+
+    #help {
+      padding: 0px 10px;
+      text-align: left;
+    }
+
+    #login {
+      cursor: pointer;
+      border: 1px solid #999;
+      border-radius: 4px;
+      font-weight: 600;
+      margin: 20px;
+      width: 200px;
+      padding: 10px 0;
+      box-shadow: 0 0 20px rgba(104, 85, 224, 0.2);
+      transition: 0.4s;
+    }
+
+    #login-wrapper {
+      text-align: center;
+    }
+
+    .link {
+      text-decoration: none;
+    }
+
+    .header-column {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .logout-icon {
+      vertical-align: bottom;
+      margin-left: 2px;
+    }
+
+    #account_column2,
+    #account_column3,
+    #account_column4 {
+      margin-left: 10px;
+    }
+
+    #account_column1 {
+      width: 250px;
+    }
+
+    #menu-item {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div style="overflow: hidden !important">
+  <div class="header">
+    <div class="header-column">
+      <img
+        src="data:image/png;base64,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" />
+      <div style="margin-left:15px">
+        <h1 style="margin:10px 10px -10px 0px">AI-cruiter </h1>
+        <p>by WorkInBiotech.com</p>
+      </div>
+    </div>
+  </div>
+
+  <span id="loader" class="loader"></span>
+
+  <div id="root">
+    <div class="account" id="account">
+      <div id="login-wrapper" style="width:409px">
+        <button id="login">Log in | Sign up</button>
+      </div>
+      <div class="account-column" id="account_column1" style="text-align:left">
+        <span style="font-size:20px">Account:</span>
+        <div id="user-info" style="margin-bottom:5px">
+          <div id="user-email" style="display:inline-block; cursor:pointer"></div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
+            class="bi bi-caret-down-fill custom-prompt-icon" viewBox="0 0 16 16">
+            <path
+              d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+          </svg>
+        </div>
+        <div id="logout-element" style="display: none">
+          <div id="logout" style="text-align:right; height:0px; margin-top:2px">
+            Log out
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+              class="bi bi-box-arrow-right logout-icon" viewBox="0 0 16 16">
+              <path fill-rule="evenodd"
+                d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z" />
+              <path fill-rule="evenodd"
+                d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="account-column" id="account_column2">
+        <div class="link faq" id="menu-item" style="cursor:pointer">
+          FAQ
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-question-circle faq-icon" viewBox="0 0 16 16">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+            <path
+              d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
+          </svg>
+        </div>
+      </div>
+      <div class="account-column" id="account_column3">
+        <div class="link options" id="menu-item" style="cursor:pointer">
+          Options
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-gear options-icon" viewBox="0 0 16 16">
+            <path
+              d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z" />
+            <path
+              d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-container">
+      <p id="help" style="color:red"></p>
+
+      <span style="font-size:20px">Job:</span>
+      <div id="selected-job" style="margin-bottom:5px">
+
+        <div style="clear: both;"></div>
+
+        <div id="job-detail">
+            <p>
+            <h4>Job title:</h4> <a target="__blank" id="job"></a></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="applicants-container">
+      <span style="font-size:20px">Applicants:</span>
+
+      <div id="evaluation-container" style="display:flex;align-items:center;justify-content:end;margin-top:15px">
+        <div class="evaluation-spinner" style="margin-right:10px"></div>
+        <button id="evaluate" class="button btn-primary">SUMMARIZE APPLICANTS</button>
+        <button id="pause" class="button btn-secondary" style="margin-left:10px">PAUSE</button>
+      </div>
+      <div id="evaluation-log" style="visibility: hidden; color: red"></div>
+    </div>
+    </div>
+  </div>
+  </div>
+
+  <script src="jquery.js"></script>
+  <script src="dist/popup.bundle.js"></script>
+</body>
+
+</html>

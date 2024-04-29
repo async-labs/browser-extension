@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es6",
+    "module": "es6",
+    "lib": ["dom", "es2015"],
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "jsx": "react"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "window.zoomLevel": 0,
+  "files.autoSave": "afterDelay",
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/production-server": true,
+    "**/lambda/src/api": true,
+    "**/.next": true,
+    "**/.coverage": true
+  },
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.alwaysShowStatus": true,
+  "eslint.workingDirectories": [
+    { "directory": "./admin", "changeProcessCWD": true },
+    { "directory": "./recruit", "changeProcessCWD": true },
+    { "directory": "./wib", "changeProcessCWD": true },
+    { "directory": "./scripts/script-live", "changeProcessCWD": true },
+    { "directory": "./scripts/script-1-greenhouse", "changeProcessCWD": true },
+    { "directory": "./scripts/script-2-lever", "changeProcessCWD": true },
+    { "directory": "./scripts/script-3-rest", "changeProcessCWD": true },
+  ],
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
+}

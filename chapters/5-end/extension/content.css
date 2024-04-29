@@ -1,0 +1,102 @@
+.spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(farthest-side, #09090d 94%, #0000) top/9px 9px no-repeat,
+    conic-gradient(#0000 30%, #09090d);
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 9px), #000 0);
+  animation: spinner-c7wet2 1s infinite linear;
+}
+
+@keyframes spinner-c7wet2 {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.chatgpt-error {
+  font-size:12px;
+  color:red;
+}
+
+.evaluation-row {
+  margin-top:10px;
+  position: absolute;
+  left: 300px;
+}
+
+.evaluation-row-breezy {
+  z-index: 10;
+  left: 0px;
+  top: 40px;
+}
+
+.evaluation-row-breezy .tooltip {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 13px;
+}
+
+.evaluation-row-breezy input {
+  width: 10px;
+  height: 10px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.evaluation-row-breezy img {
+  width: 20px;
+  height: 20px;
+}
+
+.evaluation-row-breezy svg {
+  width: 10px;
+  height: 10px;
+  left: 20px
+}
+
+section .draggable {
+  position: relative;
+}
+.evaluated-indicator {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  vertical-align: inherit !important;
+}
+
+.evaluated-indicator-read {
+  opacity: 0.5;
+}
+
+.tooltip {
+  opacity: 1 !important;
+  position: relative !important;
+  display: inline-block !important;
+  border-bottom: 1px dotted black;
+  border: none;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  white-space: pre-line;
+  width: 800px;
+  background-color: black;
+  color: #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+  position: absolute;
+  z-index: 1;
+  left: 110%;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 3%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}

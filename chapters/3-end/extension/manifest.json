@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "AI-cruiter by WorkInBiotech.com",
+  "version": "1.0.0",
+  "description": "AI-cruiter by WorkInBiotech.com",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    },
+    "default_title": "AI-cruiter",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://workinbiotech.com/*",
+        "https://*.breezy.hr/*"
+      ],
+      "css": ["content.css"]
+    },
+    {
+      "matches": [
+        "https://workinbiotech.com/*",
+        "https://*.breezy.hr/*"
+      ],
+      "js": ["jquery.js"]
+    },
+    {
+      "matches": [
+        "https://workinbiotech.com/*",
+        "https://*.breezy.hr/*"
+      ],
+      "js": ["dist/content.bundle.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "background": {
+    "service_worker": "dist/background.bundle.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "permissions": ["tabs", "webNavigation", "storage"],
+  "options_page": "options.html"
+}
