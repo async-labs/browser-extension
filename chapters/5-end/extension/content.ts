@@ -177,12 +177,6 @@ export default class ContentScript {
     $('section').css({ overflow: 'auto' });
   }
 
-  insertIndicator(href: string, elmToPrepend: any) {
-    $(`a[href='${href}']`)
-      .closest(this.closestSelector())
-      .prepend(elmToPrepend);
-  }
-
   findFullName(href: string) {
     return $(`a[href='${href}']`).closest(this.closestSelector()).find('.candidate-details h4').text();
   }
@@ -253,7 +247,9 @@ export default class ContentScript {
 
     const elmToPrepend = `<div data-href="${href}" class="evaluation-row evaluation-row-breezy">${elm}</div>`;
 
-    this.insertIndicator(href, elmToPrepend);
+    $(`a[href='${href}']`)
+      .closest(this.closestSelector())
+      .prepend(elmToPrepend);
   }
 
   async finishedRunning(sendStatus = true) {
