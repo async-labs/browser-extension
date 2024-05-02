@@ -553,13 +553,6 @@ export default class ContentScript {
     }
   };
 
-  evaluationContainer() {
-    return `
-      <div id="evaluation-container">
-      </div>
-    `;
-  }
-
   listen() {
     chrome.runtime.onMessage.addListener(
       async (message: any, sender: any, sendResponse: any) => {
@@ -572,8 +565,6 @@ export default class ContentScript {
           $('.evaluation-row .spinner').remove();
           await this.finishedRunning(false);
 
-          let lastNumberOfSummaries = 0;
-
           for (const elem of $(this.rowSelector())) {
             const href = $(elem).attr('href');
 
@@ -585,8 +576,6 @@ export default class ContentScript {
                 href,
                 responseText: 'Loading ...',
               });
-
-              lastNumberOfSummaries++;
             }
           }
 
@@ -712,7 +701,7 @@ export default class ContentScript {
       this.containerInterval = setInterval(() => {
         if ($('#evaluation-container').length === 0) {
           setTimeout(() => {
-            $('.position-pipeline').prepend(this.evaluationContainer());
+            $('.position-pipeline').prepend(`<div id="evaluation-container"></div>`);
 
             setTimeout(() => {
               for (const draggable of $('section .draggable')) {
