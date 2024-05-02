@@ -159,32 +159,6 @@ export default class ContentScript {
     };
   }
 
-  async onUrlchangedHook() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        for (const draggable of $('section .draggable')) {
-          const href = `/app/c/${this.findCompanyFriendlyId()}/p/${this.postingIdParam()[0]}/candidates/${$(draggable).attr('data-candidate-id')}/discussion`;
-
-          if ($(`a[href="${href}"]`).length === 0) {
-            $(draggable).append(`<a class="evaluation-href" href="${href}"><a>`)
-          }
-        };
-
-        resolve('ok');
-      }, 2000)
-    })
-  }
-
-  injectContainer() {
-    setTimeout(async () => {
-      if ($('#evaluation-container').length === 0) {
-        $('.position-pipeline').prepend(this.evaluationContainer());
-        await this.onUrlchangedHook();
-        await this.showPreviousResults();
-      }
-    }, 4000);
-  }
-
   async generateJobTitle(): Promise<string> {
     const jd = await this.generateJobDetail();
 
@@ -208,7 +182,6 @@ export default class ContentScript {
       .closest(this.closestSelector())
       .prepend(elmToPrepend);
   }
-
 
   findFullName(href: string) {
     return $(`a[href='${href}']`).closest(this.closestSelector()).find('.candidate-details h4').text();
@@ -738,7 +711,21 @@ export default class ContentScript {
       // reinsert it every second. If the element is present, we will do nothing
       this.containerInterval = setInterval(() => {
         if ($('#evaluation-container').length === 0) {
-          this.injectContainer();
+          setTimeout(() => {
+            $('.position-pipeline').prepend(this.evaluationContainer());
+
+            setTimeout(() => {
+              for (const draggable of $('section .draggable')) {
+                const href = `/app/c/${this.findCompanyFriendlyId()}/p/${this.postingIdParam()[0]}/candidates/${$(draggable).attr('data-candidate-id')}/discussion`;
+
+                if ($(`a[href="${href}"]`).length === 0) {
+                  $(draggable).append(`<a class="evaluation-href" href="${href}"><a>`)
+                }
+              };
+            }, 2000)
+
+            this.showPreviousResults();
+          }, 4000)
         }
       }, 1000);
     }
