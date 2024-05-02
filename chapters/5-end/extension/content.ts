@@ -268,12 +268,6 @@ export default class ContentScript {
 
     changeTitle(false);
     sendMessage({ action: 'changeIcon', loading: false });
-
-    await fetchAPI({
-      action: 'pause-job',
-      data: { jobId: this.postingIdParam()[0] },
-      contentType: 'json',
-    });
   }
 
   async processRow({ elem, postingId }: IProcessRow) {
