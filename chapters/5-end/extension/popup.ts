@@ -87,13 +87,6 @@ const fetchUserInfo = async () => {
   isLoadedUserInfo = true;
 }
 
-const fetchJobInfo = async (title: string) => {
-  if (title) {
-    $('#selected-job').show();
-    $('#job').text(`${title}`);
-  }
-}
-
 $('#login').on('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs: any[]) {
     window.open(`chrome-extension://${chrome.runtime.id}/options.html?redirect_url=${encodeURIComponent(tabs[0].url)}&tabId=${tabs[0].id}`)
@@ -116,10 +109,6 @@ $('#user-info').on('click', () => {
   } else {
     menuBox.css('display', 'block')
   }
-});
-
-$('.faq').on('click', () => {
-  window.open('https://workinbiotech.com/ai-cruiter#faq', '_blank');
 });
 
 $('.options').on('click', () => {
@@ -156,7 +145,10 @@ chrome.runtime.onMessage.addListener(function (
   }
 
   if (message.action === 'receiveJobTitle') {
-    fetchJobInfo(message.text);
+    if (message.text) {
+      $('#selected-job').show();
+      $('#job').text(message.text);
+    }
   }
 
   sendResponse({ response: 'Message received in popup script!' });
