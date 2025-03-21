@@ -1,17 +1,17 @@
-import Stripe from 'stripe';
-import Users, { IUserDocument } from './models/users';
-import { connectToDatabase, disconnectFromDatabase } from './mongoose';
-import { requireLogin } from './utils';
+import Stripe from "stripe";
+import Users, { IUserDocument } from "./models/users";
+import { connectToDatabase, disconnectFromDatabase } from "./mongoose";
+import { requireLogin } from "./utils";
 
-import * as dotenv from 'dotenv';
-import getEmailTemplate from './models/email-templates';
-import sendEmail from './aws-ses';
+import * as dotenv from "dotenv";
+import getEmailTemplate from "./models/email-templates";
+import sendEmail from "./aws-ses";
 
 dotenv.config();
 
 const { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_KEY, STRIPE_PLAN1_PRICE_ID, STRIPE_PLAN2_PRICE_ID } = process.env;
 
-const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2022-11-15' });
+const stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: "2025-02-24.acacia" });
 
 const sendStripeEmail = async (toEmail: string, template: string) => {
   let emailTemplate = await getEmailTemplate(template);
@@ -20,12 +20,12 @@ const sendStripeEmail = async (toEmail: string, template: string) => {
     await sendEmail({
       from: `AI-recruiter <${process.env.EMAIL_SUPPORT_FROM_ADDRESS}>`,
       to: [toEmail],
-      cc: ['recruit@workinbiotech.com'],
+      cc: ["recruit@workinbiotech.com"],
       subject: emailTemplate.subject,
       body: emailTemplate.message,
     });
   } catch (err) {
-    console.log('Email sending error:', err);
+    console.log("Email sending error:", err);
   }
 };
 
@@ -35,35 +35,32 @@ const saveInvoice = async (user, event) => {
   let invoices = user.stripeInvoices || [];
 
   // delete previous entry
-  invoices = invoices.filter(invoice => invoice.id !== invoicePayment.id);
+  invoices = invoices.filter((invoice) => invoice.id !== invoicePayment.id);
 
   invoices.push(invoicePayment);
 
-  await Users.updateOne(
-    { _id: user._id },
-    { $set: { stripeInvoices: invoices } }
-  );
+  await Users.updateOne({ _id: user._id }, { $set: { stripeInvoices: invoices } });
 
   return invoicePayment;
 };
 
 export const webhook = async (req, res, next) => {
-  const sig = req.headers['stripe-signature'];
+  const sig = req.headers["stripe-signature"];
 
-  let rawData = '';
+  let rawData = "";
 
-  req.on('data', (chunk) => {
+  req.on("data", (chunk) => {
     // Accumulate the raw request body
     rawData += chunk;
   });
 
-  req.on('end', async () => {
+  req.on("end", async () => {
     let event;
 
     try {
       event = stripe.webhooks.constructEvent(rawData, sig, STRIPE_WEBHOOK_KEY);
     } catch (error) {
-      console.error('Webhook signature verification failed.', error.message);
+      console.error("Webhook signature verification failed.", error.message);
       return res.sendStatus(400);
     }
 
@@ -73,16 +70,15 @@ export const webhook = async (req, res, next) => {
 
     // Handle specific event types
     switch (event.type) {
-      case 'checkout.session.completed':
-        if (data.mode === 'subscription') {
-          const selector = { 'stripeCustomer.id': data.customer };
+      case "checkout.session.completed":
+        if (data.mode === "subscription") {
+          const selector = { "stripeCustomer.id": data.customer };
           const user = await Users.findOne(selector);
 
           if (user) {
-            await Users.updateOne(
-              selector,
-              { $set: { stripeCustomer: { id: data.customer }, activePricingPlan: data.metadata.plan } }
-            );
+            await Users.updateOne(selector, {
+              $set: { stripeCustomer: { id: data.customer }, activePricingPlan: data.metadata.plan },
+            });
 
             try {
               await Users.subscribe({
@@ -90,15 +86,13 @@ export const webhook = async (req, res, next) => {
                 user,
               });
             } catch (error) {
-              console.error('Failed to save subscription:', error);
+              console.error("Failed to save subscription:", error);
             }
           }
         }
 
-        if (data.mode === 'setup') {
-          const setupIntent: any = await stripe.setupIntents.retrieve(
-            data.setup_intent
-          );
+        if (data.mode === "setup") {
+          const setupIntent: any = await stripe.setupIntents.retrieve(data.setup_intent);
 
           await stripe.customers.update(setupIntent.customer, {
             invoice_settings: {
@@ -106,46 +100,40 @@ export const webhook = async (req, res, next) => {
             },
           });
 
-          await stripe.subscriptions.update(
-            setupIntent.metadata.subscription_id,
-            {
-              default_payment_method: setupIntent.payment_method,
-            }
-          );
+          await stripe.subscriptions.update(setupIntent.metadata.subscription_id, {
+            default_payment_method: setupIntent.payment_method,
+          });
         }
 
         break;
 
-      case 'customer.source.expiring':
+      case "customer.source.expiring":
         const expiringData = event.data.object;
 
         const user = await Users.findOne({
-          'stripeCustomer.id': expiringData.customer,
+          "stripeCustomer.id": expiringData.customer,
         });
 
         if (user) {
-          await sendStripeEmail(user.email, 'customerSourceExpiring');
+          await sendStripeEmail(user.email, "customerSourceExpiring");
         }
 
         break;
 
-      case 'invoice.payment_failed':
-        const pfselector = { 'stripeCustomer.id': event.data.object.customer };
+      case "invoice.payment_failed":
+        const pfselector = { "stripeCustomer.id": event.data.object.customer };
         const pfuser = await Users.findOne(pfselector);
 
         if (pfuser) {
           const invoicePayment = await saveInvoice(pfuser, event);
 
-          await sendStripeEmail(
-            invoicePayment.customer_email,
-            'paymentFailedNotification'
-          );
+          await sendStripeEmail(invoicePayment.customer_email, "paymentFailedNotification");
         }
 
         break;
 
-      case 'invoice.payment_succeeded':
-        const selector = { 'stripeCustomer.id': event.data.object.customer };
+      case "invoice.payment_succeeded":
+        const selector = { "stripeCustomer.id": event.data.object.customer };
         const dbuser = await Users.findOne(selector);
 
         if (dbuser) {
@@ -178,18 +166,16 @@ export const createSession = async ({
   customer?;
 }) => {
   const options: any = {
-    payment_method_types: ['card'],
+    payment_method_types: ["card"],
     mode,
-    success_url:
-      'https://workinbiotech.com/ai-cruiter?ai-cruiter-stripe-url=success',
-    cancel_url:
-      'https://workinbiotech.com/ai-cruiter?ai-cruiter-stripe-url=cancel',
+    success_url: "https://workinbiotech.com/ai-cruiter?ai-cruiter-stripe-url=success",
+    cancel_url: "https://workinbiotech.com/ai-cruiter?ai-cruiter-stripe-url=cancel",
   };
 
-  if (mode === 'subscription') {
+  if (mode === "subscription") {
     options.line_items = [
       {
-        price: plan === 'plan1' ? STRIPE_PLAN1_PRICE_ID : STRIPE_PLAN2_PRICE_ID,
+        price: plan === "plan1" ? STRIPE_PLAN1_PRICE_ID : STRIPE_PLAN2_PRICE_ID,
         quantity: 1,
       },
     ];
@@ -201,7 +187,7 @@ export const createSession = async ({
     if (user && user.stripeCustomer && user.stripeCustomer.id) {
       stripeCustomerId = user.stripeCustomer.id;
     } else {
-      const stripeCustomer = (await stripe.customers.create({ email: user.email }));
+      const stripeCustomer = await stripe.customers.create({ email: user.email });
       stripeCustomerId = stripeCustomer.id;
       await Users.updateOne({ _id: user._id }, { $set: { stripeCustomer } });
     }
@@ -209,7 +195,7 @@ export const createSession = async ({
     options.customer = stripeCustomerId;
   }
 
-  if (mode === 'setup') {
+  if (mode === "setup") {
     options.customer = customer;
     options.setup_intent_data = {
       metadata: {
@@ -233,15 +219,15 @@ export const createSubscription = async (req, res, next) => {
 
   try {
     const session = await createSession({
-      mode: 'subscription',
+      mode: "subscription",
       user: req.user,
-      plan
+      plan,
     });
 
     response = { url: session.url };
   } catch (error) {
     console.error(error);
-    res = { error: 'Something went wrong' };
+    response = { error: "Something went wrong" };
   }
 
   await disconnectFromDatabase();
@@ -265,21 +251,17 @@ export const getSubscription = async (req, res, next) => {
   const user = await Users.findOne({ _id: userId });
 
   if (!user.stripeSubscription || !user.stripeSubscription.id) {
-    return res.json({ subscriptionId: '' });
+    return res.json({ subscriptionId: "" });
   }
 
-  const subscription = await stripe.subscriptions.retrieve(
-    user.stripeSubscription.id
-  );
+  const subscription = await stripe.subscriptions.retrieve(user.stripeSubscription.id);
 
   const invoices = user.stripeInvoices || [];
 
-  const customerId = user.stripeCustomer ? user.stripeCustomer.id : '';
+  const customerId = user.stripeCustomer ? user.stripeCustomer.id : "";
   const default_payment_method_id: any = subscription.default_payment_method;
 
-  const paymentMethod = await stripe.paymentMethods.retrieve(
-    default_payment_method_id
-  );
+  const paymentMethod = await stripe.paymentMethods.retrieve(default_payment_method_id);
 
   const card: any = paymentMethod ? paymentMethod.card : null;
 
@@ -287,7 +269,7 @@ export const getSubscription = async (req, res, next) => {
 
   try {
     const session = await createSession({
-      mode: 'setup',
+      mode: "setup",
       user,
       customer: customerId,
       subscriptionId: subscription.id,
@@ -301,12 +283,8 @@ export const getSubscription = async (req, res, next) => {
   return res.json({ plan: user.activePricingPlan, subscription, invoices, card });
 };
 
-export const deleteSubscription = ({
-  subscriptionId,
-}: {
-  subscriptionId: string;
-}) => {
-  return stripe.subscriptions.del(subscriptionId);
+export const deleteSubscription = ({ subscriptionId }: { subscriptionId: string }) => {
+  return stripe.subscriptions.cancel(subscriptionId);
 };
 
 export const cancelSubscription = async (req, res, next) => {
@@ -318,7 +296,7 @@ export const cancelSubscription = async (req, res, next) => {
 
   await disconnectFromDatabase();
 
-  return res.send('ok');
+  return res.send("ok");
 };
 
 export const cancelSubscriptionHandler = async (userId: string) => {
@@ -342,11 +320,11 @@ export const cancelSubscriptionHandler = async (userId: string) => {
     { _id: userId },
     {
       $set: {
-        activePricingPlan: '',
+        activePricingPlan: "",
         isSubscriptionActive: false,
         activePricingPlanWhenCancel: user.activePricingPlan,
-        stripeSubscription: deletedSubscription
-      }
+        stripeSubscription: deletedSubscription,
+      },
     }
   );
 };
